@@ -1,0 +1,132 @@
+.secao_conteudo {
+    padding: 40px 20px;
+}
+
+.cartao_grande {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cartao_cabecalho {
+    padding: 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cartao_titulo {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cartao_descricao {
+    color: #666;
+    font-size: 14px;
+}
+
+.cartao_corpo {
+    padding: 24px;
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.campo_grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo_label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.campo_input {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.campo_input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.campo_select {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.campo_select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.grade_duas_colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.grupo_botoes {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.grupo_botoes .botao_secundario,
+.grupo_botoes .botao_principal {
+    flex: 1;
+}
+
+.botao_principal {
+    padding: 12px 20px;
+    background-color: #111;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.botao_principal:hover {
+    background-color: #333;
+}
+
+.botao_secundario {
+    padding: 12px 20px;
+    background-color: #fff;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.botao_secundario:hover {
+    background-color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    .grade_duas_colunas {
+        grid-template-columns: 1fr;
+    }
+}

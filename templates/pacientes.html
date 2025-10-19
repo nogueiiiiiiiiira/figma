@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/pacientes.css">
+</head>
+<body>
+    <header class="cabecalho">
+        <div class="container">
+            <div class="cabecalho_conteudo">
+                <div class="cabecalho_esquerda">
+                    <h1 class="titulo_sistema">Sistema de Gerenciamento</h1>
+                    <nav class="menu_navegacao">
+                        <a href="home.html" class="link_menu">Home</a>
+                        <a href="usuarios.html" class="link_menu">Usuários</a>
+                        <a href="pacientes.html" class="link_menu">Pacientes</a>
+                        <a href="funcionarios.html" class="link_menu">Funcionários</a>
+                        <a href="eventos.html" class="link_menu">Eventos</a>
+                    </nav>
+                </div>
+                <a href="login.html" class="botao_sair">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="secao_conteudo">
+            <div class="container">
+                <div class="cartao_grande">
+                    <div class="cartao_cabecalho">
+                        <div class="cartao_cabecalho_flex">
+                            <div>
+                                <h3 class="cartao_titulo">Pacientes Cadastrados</h3>
+                                <p class="cartao_descricao">Gerencie os pacientes do sistema</p>
+                            </div>
+                            <a href="pacientes_form.html" class="botao_adicionar">+ Novo Paciente</a>
+                        </div>
+                    </div>
+                    
+                    <div class="tabela_container">
+                        <table class="tabela">
+                            <thead class="tabela_cabecalho">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th class="tabela_acoes">Ações</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

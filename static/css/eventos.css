@@ -1,0 +1,196 @@
+.secao_conteudo {
+    padding: 40px 20px;
+}
+
+.cartao_grande {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cartao_cabecalho {
+    padding: 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cartao_cabecalho_flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cartao_titulo {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cartao_descricao {
+    color: #666;
+    font-size: 14px;
+}
+
+.botao_adicionar {
+    padding: 10px 20px;
+    background-color: #111;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.botao_adicionar:hover {
+    background-color: #333;
+}
+
+.tabela_container {
+    overflow-x: auto;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela_cabecalho {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tabela_cabecalho th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.tabela_corpo tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tabela_corpo tr:hover {
+    background-color: #f9f9f9;
+}
+
+.tabela_corpo td {
+    padding: 16px;
+}
+
+.tabela_acoes {
+    text-align: right;
+}
+
+.botao_editar {
+    padding: 8px 16px;
+    background-color: #fff;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.botao_editar:hover {
+    background-color: #f5f5f5;
+}
+
+.botao_remover {
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.botao_remover:hover {
+    background-color: #c82333;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.badge_azul {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border-color: #90caf9;
+}
+
+.badge_vermelho {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ef9a9a;
+}
+
+.badge_verde {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-color: #a5d6a7;
+}
+
+.badge_roxo {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+    border-color: #ce93d8;
+}
+
+.badge_amarelo {
+    background-color: #fff9c4;
+    color: #f57f17;
+    border-color: #fff59d;
+}
+
+.badge_rosa {
+    background-color: #fce4ec;
+    color: #c2185b;
+    border-color: #f8bbd0;
+}
+
+.badge_indigo {
+    background-color: #e8eaf6;
+    color: #283593;
+    border-color: #9fa8da;
+}
+
+.badge_ciano {
+    background-color: #e0f7fa;
+    color: #00838f;
+    border-color: #80deea;
+}
+
+.badge_cinza {
+    background-color: #f5f5f5;
+    color: #616161;
+    border-color: #e0e0e0;
+}
+
+.texto_centralizado {
+    text-align: center;
+}
+
+.texto_cinza {
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .tabela_container {
+        font-size: 14px;
+    }
+}
