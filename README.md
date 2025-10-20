@@ -28,6 +28,6 @@ O terminal físico será construído com uma placa ESP32. A identificação do v
 Um display LCD fornece feedback ao usuário, exibindo mensagens de confirmação.
 A ESP32, programada em MicroPython, processa a identificação e publica imediatamente uma mensagem contendo o ID do voluntário e o tipo de registro em um tópico MQTT.
 
-IDEIA DA INTERFACE WEB:
+# IDEIA DA INTERFACE WEB:
 A interface web será um painel administrativo com acesso restrito por login e senha. Mas também terá uma parte onde qualquer um pode registrar manualmente o ponto batido, desde que o ID/CPF seja encontrado no sistema.
 A integração com o terminal físico (ESP32) ocorre através do protocolo MQTT. O servidor web recebe as mensagens de ponto publicadas pela ESP32 e guarda elas no banco de dados.
