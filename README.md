@@ -1,7 +1,7 @@
-# READE (nao pronto, aguardandos ats
+# READE (nao pronto, aguardandos ats)
 
-$ MINI MUNDO:
-Um centro de acolhimento depende de voluntários para suas atividades diárias. Atualmente, o controle de presença é realizado mediante assinatura em uma folha de papel, o que gesta problemas como perda de registros, dificuldade de cálculo de horas e falta de um histórico organizado. O projeto propõe um sistema de controle de ponto digital, com um terminal físico na entrada do centro. Esse terminal permite ao voluntário registrar sua chegada e saída de forma rápida e confiável, armazenando os dados digitalmente para acesso e gestão posterior.
+# MINI MUNDO:
+Atualmente, o controle de presença do Hospital Cajuru é realizado com assinatura em folha de papel, o que gesta problemas como perda de registros, dificuldade de cálculo de horas e falta de um histórico organizado e dinâmico e moderno. O projeto tem como objetivo criar um sistema de controle de ponto digital legal. Esse terminal permite ao voluntário registrar sua chegada e saída de forma rápida e confiável, armazenando os dados para acesso e gestão para alguém autorizado cuidar.
 
 # REQUISITOS FUNCIONAIS:
 - O sistema deve oferecer duas formas de identificação no terminal: leitura de cartão RFID e digitação de um código numérico (ID ou CPF) via teclado matricial.
