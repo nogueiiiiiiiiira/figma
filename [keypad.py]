@@ -1,0 +1,46 @@
+from machine import Pin
+import time
+import sys
+
+class Keypad:
+    def __init__(self, row_pins, col_pins, key_map):
+        self.rows = [Pin(p, Pin.OUT) for p in row_pins]
+        self.cols = [Pin(p, Pin.IN, Pin.PULL_UP) for p in col_pins]
+        self.key_map = key_map
+        self.last_key = None
+        self.last_time = 0
+        self.debounce_ms = 50       
+        self.hold_ignore_ms = 400  
+
+        for r in self.rows:
+            r.value(1)
+
+    def scan(self):
+        detected = None
+
+        for r_idx, r_pin in enumerate(self.rows):
+            r_pin.value(0)
+            time.sleep_us(200)
+            for c_idx, c_pin in enumerate(self.cols):
+                if c_pin.value() == 0:
+                    candidate = self.key_map[r_idx][c_idx]
+                    time.sleep_ms(self.debounce_ms)
+                    if c_pin.value() == 0:
+                        r_pin.value(1)
+                        now = time.ticks_ms()
+                        if self.last_key == candidate:
+                            if time.ticks_diff(now, self.last_time) > self.hold_ignore_ms:
+                                self.last_time = now
+                                return candidate
+                            else:
+                                return None
+                        else:
+                            self.last_key = candidate
+                            self.last_time = now
+                            return candidate
+            r_pin.value(1)
+
+        if detected is None:
+            self.last_key = None
+        return None
+
