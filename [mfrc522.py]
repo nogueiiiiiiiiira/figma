@@ -1,0 +1,253 @@
+# mfrc522.py - driver MFRC522 adaptado para módulos clonados / tolerantes
+# Versão simplificada mas com mais retries, delays e sem checagem rígida de VersionReg.
+
+from machine import Pin, SPI
+import time
+
+# Registradores e comandos (subset)
+CommandReg = 0x01
+CommIEnReg = 0x02
+CommIrqReg = 0x04
+FIFOLevelReg = 0x0A
+FIFODataReg = 0x09
+BitFramingReg = 0x0D
+ModeReg = 0x11
+TxControlReg = 0x14
+TModeReg = 0x2A
+TPrescalerReg = 0x2B
+TReloadRegH = 0x2C
+TReloadRegL = 0x2D
+CRCResultRegM = 0x21
+CRCResultRegL = 0x22
+ErrorReg = 0x06
+ControlReg = 0x0C
+Status2Reg = 0x08
+VersionReg = 0x37
+
+# Commands
+PCD_IDLE = 0x00
+PCD_CALCCRC = 0x03
+PCD_TRANSCIEVE = 0x0C
+PCD_AUTHENT = 0x0E
+PCD_SOFTRESET = 0x0F
+
+# PICC
+PICC_REQIDL = 0x26
+PICC_ANTICOLL = 0x93
+PICC_SElECTTAG = 0x93
+PICC_AUTHENT1A = 0x60
+PICC_READ = 0x30
+PICC_HALT = 0x50
+
+class MFRC522:
+    def __init__(self, sck=18, mosi=23, miso=19, sda=5, rst=22, spi_id=1, baudrate=500000, reset_delay=80, transceive_timeout=3000):
+        """
+        spi_id: 1 ou 2 no ESP32
+        baudrate: default 500k (tolerante)
+        reset_delay: ms para manter reset baixo
+        transceive_timeout: ciclos de espera no transceive
+        """
+        self.sda_pin_n = sda
+        self.rst_pin_n = rst
+        self.spi_id = spi_id
+        self.baudrate = baudrate
+        self.reset_delay = reset_delay
+        self.transceive_timeout = transceive_timeout
+
+        self.sda = Pin(sda, Pin.OUT)
+        self.rst = Pin(rst, Pin.OUT)
+        # SPI init
+        self.spi = SPI(spi_id, baudrate=baudrate, polarity=0, phase=0, sck=Pin(sck), mosi=Pin(mosi), miso=Pin(miso))
+        self.sda.value(1)
+        time.sleep_ms(20)
+        self.reset()
+        # registers init (values tolerant)
+        self._write_reg(TModeReg, 0x8D)
+        self._write_reg(TPrescalerReg, 0x3E)
+        self._write_reg(TReloadRegL, 30)
+        self._write_reg(TReloadRegH, 0)
+        self._write_reg(ModeReg, 0x3D)
+        # enable antenna with mask attempts
+        try:
+            self._set_bit_mask(TxControlReg, 0x03)
+        except Exception:
+            pass
+        time.sleep_ms(20)
+
+    def reset(self):
+        # pulso reset com delay configurável
+        self.rst.value(0)
+        time.sleep_ms(self.reset_delay)
+        self.rst.value(1)
+        time.sleep_ms(10)
+
+    # Low-level access
+    def _write_reg(self, reg, val):
+        addr = ((reg << 1) & 0x7E)
+        self.sda.value(0)
+        try:
+            self.spi.write(bytearray([addr, val]))
+        finally:
+            self.sda.value(1)
+
+    def _read_reg(self, reg):
+        addr = (((reg << 1) & 0x7E) | 0x80)
+        self.sda.value(0)
+        try:
+            self.spi.write(bytearray([addr]))
+            res = self.spi.read(1)
+            return res[0]
+        finally:
+            self.sda.value(1)
+
+    def _set_bit_mask(self, reg, mask):
+        v = self._read_reg(reg)
+        self._write_reg(reg, v | mask)
+
+    def _clear_bit_mask(self, reg, mask):
+        v = self._read_reg(reg)
+        self._write_reg(reg, v & (~mask))
+
+    def _calculate_crc(self, data):
+        # escreve FIFO e pede cálculo CRC
+        self._clear_bit_mask(DivlEn := 0x03, 0x04)  # DivlEnReg mask clear (best-effort)
+        self._write_reg(CommandReg, PCD_IDLE)
+        # flush FIFO
+        self._set_bit_mask(FIFOLevelReg, 0x80)
+        for d in data:
+            self._write_reg(FIFODataReg, d)
+        self._write_reg(CommandReg, PCD_CALCCRC)
+        # espera resultado (timeout)
+        i = 0xFF
+        while True:
+            if not (self._read_reg(CommandReg) & 0x04):
+                break
+            i -= 1
+            if i == 0:
+                return None
+        return (self._read_reg(CRCResultRegM), self._read_reg(CRCResultRegL))
+
+    def _to_card(self, command, send_data):
+        back_data = []
+        back_len = 0
+        status = False
+        irq_en = 0x77
+        wait_irq = 0x30
+
+        # prepare
+        try:
+            self._write_reg(CommIEnReg, irq_en | 0x80)
+        except Exception:
+            pass
+        self._clear_bit_mask(CommIrqReg, 0x80)
+        self._set_bit_mask(FIFOLevelReg, 0x80)
+        self._write_reg(CommandReg, PCD_IDLE)
+
+        for d in send_data:
+            self._write_reg(FIFODataReg, d)
+        self._write_reg(CommandReg, command)
+        if command == PCD_TRANSCIEVE:
+            self._set_bit_mask(BitFramingReg, 0x80)  # StartSend
+
+        # esperar com timeout aumentado
+        i = self.transceive_timeout
+        while True:
+            n = 0
+            try:
+                n = self._read_reg(CommIrqReg)
+            except Exception:
+                n = 0
+            i -= 1
+            if (n & wait_irq) or (n & 0x01) or i <= 0:
+                break
+
+        self._clear_bit_mask(BitFramingReg, 0x80)
+
+        if i > 0:
+            err = self._read_reg(ErrorReg)
+            if (err & 0x1B) == 0:
+                status = True
+                if (n & irq_en & 0x01) == 0:
+                    if command == PCD_TRANSCIEVE:
+                        fifo_level = self._read_reg(FIFOLevelReg)
+                        last_bits = self._read_reg(ControlReg) & 0x07
+                        if last_bits:
+                            back_len = (fifo_level - 1) * 8 + last_bits
+                        else:
+                            back_len = fifo_level * 8
+                        for _ in range(fifo_level):
+                            back_data.append(self._read_reg(FIFODataReg))
+            else:
+                status = False
+        else:
+            status = False
+
+        return status, back_data, back_len
+
+    def request(self, mode=PICC_REQIDL):
+        # Transceive request; aumenta tentativas
+        # Tenta algumas vezes para clones lentos
+        for attempt in range(3):
+            try:
+                self._write_reg(BitFramingReg, 0x07)
+                status, back_data, back_bits = self._to_card(PCD_TRANSCIEVE, [mode])
+                if status and back_bits:
+                    return True, back_bits
+            except Exception:
+                pass
+            time.sleep_ms(50 + attempt * 20)
+        return False, None
+
+    def anticoll(self):
+        # tentativa de anticollision com retry
+        ser_num = [PICC_ANTICOLL, 0x20]
+        self._write_reg(BitFramingReg, 0x00)
+        for attempt in range(3):
+            status, back_data, back_len = self._to_card(PCD_TRANSCIEVE, ser_num)
+            if status and back_data:
+                if len(back_data) >= 5:
+                    uid = back_data[0:4]
+                    bcc = back_data[4]
+                    calc = 0
+                    for i in uid:
+                        calc ^= i
+                    if calc != bcc:
+                        # bcc falhou, tenta outra vez
+                        time.sleep_ms(30)
+                        continue
+                    return uid
+            time.sleep_ms(40)
+        return None
+
+    def select_tag(self, uid):
+        buf = [PICC_SElECTTAG, 0x70] + uid
+        crc = self._calculate_crc(buf)
+        if crc is None:
+            return False
+        buf += [crc[0], crc[1]]
+        status, back_data, back_len = self._to_card(PCD_TRANSCIEVE, buf)
+        if status and back_len == 0x18:
+            return True
+        return False
+
+    def auth(self, auth_mode, block_addr, sector_key, uid):
+        buf = [auth_mode, block_addr] + sector_key + uid[:4]
+        status, back_data, back_len = self._to_card(PCD_AUTHENT, buf)
+        if not status or not (self._read_reg(Status2Reg) & 0x08):
+            return False
+        return True
+
+    def read(self, block_addr):
+        buf = [PICC_READ, block_addr]
+        crc = self._calculate_crc(buf)
+        if crc is None:
+            return None
+        buf += [crc[0], crc[1]]
+        status, back_data, back_len = self._to_card(PCD_TRANSCIEVE, buf)
+        if status and len(back_data) == 16:
+            return back_data
+        return None
+
+    def stop_crypto(self):
+        self._clear_bit_mask(Status2Reg, 0x08)
+
