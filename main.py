@@ -3,7 +3,6 @@ from machine import Pin
 import time
 from keypad import Keypad
 
-# pinos do RFID
 pino_sck = 18
 pino_mosi = 23
 pino_miso = 19
@@ -48,10 +47,17 @@ mapa_teclas = [
 
 teclado = Keypad(pinos_linhas_teclado, pinos_colunas_teclado, mapa_teclas)
 
+led_always_on = Pin(2, Pin.OUT)
+led_blink = Pin(4, Pin.OUT)
+
+led_always_on.value(1)
+
 ultimo_uid = None
 
 try:
     while True:
+        acionou_led = False
+
         sucesso, bits = leitor_rfid.request()
         if sucesso:
             uid = leitor_rfid.anticoll()
@@ -60,6 +66,7 @@ try:
                 if uid_str != ultimo_uid:
                     print("Cartão detectado — UID:", uid_str)
                     ultimo_uid = uid_str
+                    acionou_led = True
             else:
                 print("Request OK, anticoll falhou")
         else:
@@ -70,6 +77,12 @@ try:
         tecla = teclado.scan()
         if tecla and tecla in '0123456789*#':
             print("Tecla pressionada:", tecla)
+            acionou_led = True
+
+        if acionou_led:
+            led_blink.value(1)
+            time.sleep_ms(150)
+            led_blink.value(0)
 
         time.sleep_ms(80)
 
